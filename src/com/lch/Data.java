@@ -2,9 +2,13 @@ package com.lch;
 
 public class Data {
     String line;//内容
-    Integer line_row;//行号
+    int line_row;//行号
+    public Data(Integer line_row,String line){
+        this.line = line;
+        this.line_row = line_row;
+    }
 
-    public Integer getLine_row() {
+    public int getLine_row() {
         return line_row;
     }
 

@@ -1,9 +1,10 @@
 import com.lch.*;
 import com.observer.*;
+import com.serch_strategy.Context;
+import com.serch_strategy.Sort_Baoli;
+import com.serch_strategy.Sort_Half;
 
 import javax.swing.*;
-import javax.swing.event.DocumentEvent;
-import javax.swing.event.DocumentListener;
 import javax.swing.text.BadLocationException;
 import javax.swing.text.Style;
 import javax.swing.text.StyleConstants;
@@ -20,15 +21,18 @@ public class MainWindow{
     private JButton button1;
     private JTextField textField1;
     private JTextField textField2;
-    private JButton button2;
+    private JButton button_baoli;
     private JTextArea textArea1;
     private JTextArea textArea2;
-    private JTextPane textPane1;
+    private JTextPane textPane3;
+    private JButton button_half;
+    private JButton button3;
+    private JButton button4;
+    private JButton button5;
     private static java.util.List<Observer> observers = new ArrayList<Observer>();
 
+    //将修改后TextArea2内容保存到all_Alpha
     public void modify2(){   //将修改保存给all_alpha
-        System.out.println("将修改保存给all_alpha");
-
         String[] textArea2_lines = textArea2.getText().split("\n");
         java.util.List<Data> all_Alpha = new ArrayList<>();
         if(All_Data.getData().all_Alpha.size()==textArea2_lines.length){
@@ -37,62 +41,86 @@ public class MainWindow{
             }
         }else{
             //Todo
+            int t = 0;
             for (int i=0;i<textArea2_lines.length;i++){
                 if (All_Data.getData().all_Alpha.get(i).getLine().equals(textArea2_lines[i])){
                     all_Alpha.add(new Data(All_Data.getData().all_Alpha.get(i).getLine_row(),textArea2_lines[i]));
                 }else {
-                    all_Alpha.add(new Data(All_Data.getData().all_Alpha.get(i+1).getLine_row(),textArea2_lines[i]));
+                    t=i;
+                    while (t<All_Data.getData().all_Alpha.size()){
+                        if (All_Data.getData().all_Alpha.get(t).getLine().equals(textArea2_lines[i])){
+                            all_Alpha.add(new Data(All_Data.getData().all_Alpha.get(t).getLine_row(),textArea2_lines[i]));
+                            break;
+                        }
+                        t++;
+                    }
                 }
             }
         }
         All_Data.getData().all_Alpha = all_Alpha;
 
-//        for (Data data:All_Data.getData().all_Alpha
-//             ) {
-//            System.out.println(data.getLine_row()+"     "+data.getLine());
-//        }
     }
+    //将修改后TextPane3内容保存到all_Alpha
     public void modify3(){
-        System.out.println("将修改保存给all_alpha");
-
-        String[] textArea3_lines = textPane1.getText().split("\n");
+        String[] textArea3_lines = textPane3.getText().split("\n");
         java.util.List<Data> all_Alpha = new ArrayList<>();
+
         if(All_Data.getData().all_Alpha.size()==textArea3_lines.length){
             for (int i=0;i<All_Data.getData().all_Alpha.size();i++){
                 all_Alpha.add(new Data(All_Data.getData().all_Alpha.get(i).getLine_row(),textArea3_lines[i]));
             }
         }else{
-            //Todo
             for (int i=0;i<textArea3_lines.length;i++){
-                if (All_Data.getData().all_Alpha.get(i).getLine().equals(textArea3_lines[i])){
+                if (textArea3_lines[i].equals(All_Data.getData().all_Alpha.get(i).getLine())) {
                     all_Alpha.add(new Data(All_Data.getData().all_Alpha.get(i).getLine_row(),textArea3_lines[i]));
-                }else {
+                }
+                else {
                     all_Alpha.add(new Data(All_Data.getData().all_Alpha.get(i+1).getLine_row(),textArea3_lines[i]));
                 }
             }
         }
         All_Data.getData().all_Alpha = all_Alpha;
+        for (Data data:All_Data.getData().all_Alpha
+        ) {
+            System.out.println(data.getLine_row()+" "+data.getLine());
+        }
     }
-    //Todo
-    public void notifyAllObservers(){//通知所有观察者
+    //通知所有观察者
+    public void notifyAllObservers(){
         for (Observer ob:observers){
-            ob.update(textArea2,textPane1);
+            ob.update(textArea2, textPane3);
         }
     }
 
     public MainWindow(){
         new TextArea2_Observer(observers);
         new TextArea3_Observer(observers);
-        //button1触发函数
+        //button1触发函数：排序
         button1.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
                 textArea2.setText("");
-                textPane1.setText("");
+                textPane3.setText("");
                 //进入kwic排序
                 kwic();
                 //读取文件输出
                 output();
+            }
+        });
+        //button_baoli触发函数：暴力搜索
+        button_baoli.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                Context context = new Context(new Sort_Baoli());
+                context.executeStrategy(textField1.getText(),textField2);
+            }
+        });
+        //button_half触发函数：二分搜索
+        button_half.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                Context context = new Context(new Sort_Half());
+                context.executeStrategy(textField1.getText(),textField2);
             }
         });
         //被观察者触发函数通知观察者
@@ -111,7 +139,7 @@ public class MainWindow{
                 notifyAllObservers();
             }
         });
-        textPane1.addKeyListener(new KeyListener() {
+        textPane3.addKeyListener(new KeyListener() {
             @Override
             public void keyTyped(KeyEvent e) {
 
@@ -124,8 +152,31 @@ public class MainWindow{
 
             @Override
             public void keyReleased(KeyEvent e) {
-                //System.out.println("textPanel修改keyRealease");
-                modify3();
+                System.out.println(textPane3.getText());
+
+                String[] textArea3_lines = textPane3.getText().split("\n");
+                java.util.List<Data> all_Alpha = new ArrayList<>();
+
+//                for (int i=0;i<textArea3_lines.length;i++){
+//                    System.out.println(textArea3_lines[i]);
+//                }
+
+                if(All_Data.getData().all_Alpha.size()==textArea3_lines.length){
+                    for (int i=0;i<All_Data.getData().all_Alpha.size();i++){
+                        all_Alpha.add(new Data(All_Data.getData().all_Alpha.get(i).getLine_row(),textArea3_lines[i]));
+                    }
+                }else{
+                    for (int i=0;i<textArea3_lines.length;i++){
+                        if (textArea3_lines[i].equals(All_Data.getData().all_Alpha.get(i).getLine())) {
+                            all_Alpha.add(new Data(All_Data.getData().all_Alpha.get(i).getLine_row(),textArea3_lines[i]));
+                        }
+                        else {
+                            all_Alpha.add(new Data(All_Data.getData().all_Alpha.get(i+1).getLine_row(),textArea3_lines[i]));
+                        }
+                    }
+                }
+                All_Data.getData().all_Alpha = all_Alpha;
+
                 notifyAllObservers();
             }
         });
@@ -146,89 +197,89 @@ public class MainWindow{
             else{
                 textArea2.setText(textArea2.getText()+ "\n"+data.getLine());
             }
-            Style def = textPane1.getStyledDocument().addStyle(null,null);
+            Style def = textPane3.getStyledDocument().addStyle(null,null);
             StyleConstants.setFontFamily(def,"Microsoft YaHei UI");
             StyleConstants.setFontSize(def,18);
             StyleConstants.setBold(def,true);
-            Style normal = textPane1.addStyle("normal",def);
-            Style s1 = textPane1.addStyle("blue",normal);
+            Style normal = textPane3.addStyle("normal",def);
+            Style s1 = textPane3.addStyle("blue",normal);
             StyleConstants.setForeground(s1, Color.BLUE);
-            Style s2 = textPane1.addStyle("red",normal);
+            Style s2 = textPane3.addStyle("red",normal);
             StyleConstants.setForeground(s2, Color.RED);
-            Style s3 = textPane1.addStyle("yellow",normal);
+            Style s3 = textPane3.addStyle("yellow",normal);
             StyleConstants.setForeground(s3, Color.YELLOW);
-            Style s4 = textPane1.addStyle("pink",normal);
+            Style s4 = textPane3.addStyle("pink",normal);
             StyleConstants.setForeground(s4, Color.PINK);
-            textPane1.setParagraphAttributes(normal,true);
+            textPane3.setParagraphAttributes(normal,true);
             switch(data.getLine_row()){
 
                 case 1:
-                    if(textPane1.getText().isEmpty()){
+                    if(textPane3.getText().isEmpty()){
                         try {
-                            textPane1.getDocument().insertString(textPane1.getDocument().getLength(),
-                                    data.getLine(),textPane1.getStyle("blue"));
+                            textPane3.getDocument().insertString(textPane3.getDocument().getLength(),
+                                    data.getLine(), textPane3.getStyle("blue"));
                         } catch (BadLocationException e) {
                             e.printStackTrace();
                         }
                     }
                     else{
                         try {
-                            textPane1.getDocument().insertString(textPane1.getDocument().getLength(),
-                                    "\n"+data.getLine(),textPane1.getStyle("blue"));
+                            textPane3.getDocument().insertString(textPane3.getDocument().getLength(),
+                                    "\n"+data.getLine(), textPane3.getStyle("blue"));
                         } catch (BadLocationException e) {
                             e.printStackTrace();
                         }
                     }
                     break;
                 case 2:
-                    if(textPane1.getText().isEmpty()){
+                    if(textPane3.getText().isEmpty()){
                         try {
-                            textPane1.getDocument().insertString(textPane1.getDocument().getLength(),
-                                    data.getLine(),textPane1.getStyle("red"));
+                            textPane3.getDocument().insertString(textPane3.getDocument().getLength(),
+                                    data.getLine(), textPane3.getStyle("red"));
                         } catch (BadLocationException e) {
                             e.printStackTrace();
                         }
                     }
                     else{
                         try {
-                            textPane1.getDocument().insertString(textPane1.getDocument().getLength(),
-                                    "\n"+data.getLine(),textPane1.getStyle("red"));
+                            textPane3.getDocument().insertString(textPane3.getDocument().getLength(),
+                                    "\n"+data.getLine(), textPane3.getStyle("red"));
                         } catch (BadLocationException e) {
                             e.printStackTrace();
                         }
                     }
                     break;
                 case 3:
-                    if(textPane1.getText().isEmpty()){
+                    if(textPane3.getText().isEmpty()){
                         try {
-                            textPane1.getDocument().insertString(textPane1.getDocument().getLength(),
-                                    data.getLine(),textPane1.getStyle("yellow"));
+                            textPane3.getDocument().insertString(textPane3.getDocument().getLength(),
+                                    data.getLine(), textPane3.getStyle("yellow"));
                         } catch (BadLocationException e) {
                             e.printStackTrace();
                         }
                     }
                     else{
                         try {
-                            textPane1.getDocument().insertString(textPane1.getDocument().getLength(),
-                                    "\n"+data.getLine(),textPane1.getStyle("yellow"));
+                            textPane3.getDocument().insertString(textPane3.getDocument().getLength(),
+                                    "\n"+data.getLine(), textPane3.getStyle("yellow"));
                         } catch (BadLocationException e) {
                             e.printStackTrace();
                         }
                     }
                     break;
                 case 4:
-                    if(textPane1.getText().isEmpty()){
+                    if(textPane3.getText().isEmpty()){
                         try {
-                            textPane1.getDocument().insertString(textPane1.getDocument().getLength(),
-                                    data.getLine(),textPane1.getStyle("pink"));
+                            textPane3.getDocument().insertString(textPane3.getDocument().getLength(),
+                                    data.getLine(), textPane3.getStyle("pink"));
                         } catch (BadLocationException e) {
                             e.printStackTrace();
                         }
                     }
                     else{
                         try {
-                            textPane1.getDocument().insertString(textPane1.getDocument().getLength(),
-                                    "\n"+data.getLine(),textPane1.getStyle("pink"));
+                            textPane3.getDocument().insertString(textPane3.getDocument().getLength(),
+                                    "\n"+data.getLine(), textPane3.getStyle("pink"));
                         } catch (BadLocationException e) {
                             e.printStackTrace();
                         }

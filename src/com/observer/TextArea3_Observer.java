@@ -10,14 +10,14 @@ import javax.swing.text.StyleConstants;
 import java.awt.*;
 import java.util.List;
 
-public class TextArea3_Observer extends Observer {
+public class TextArea3_Observer implements Observer {
     public TextArea3_Observer(List<Observer> observers){
         observers.add(this);
     }
 
     @Override
     public void update(JTextArea textArea_2, JTextPane textPane_3) {
-        System.out.println("我是TextArea3观察者");
+//        System.out.println("我是TextArea3观察者");
         textPane_3.setText("");
         for (Data data:All_Data.getData().all_Alpha) {
             Style def = textPane_3.getStyledDocument().addStyle(null,null);

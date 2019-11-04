@@ -59,7 +59,10 @@ public class Sort_Half implements Search_Strategy {
                     sum++;
             }
             if (sum == ch.length)
-                jTextField.setText(jTextField.getText()+" "+All_Data.getData().all_input.get(k).getLine());
+                if (jTextField.getText().isEmpty())
+                    jTextField.setText(All_Data.getData().all_input.get(k).getLine());
+                else
+                    jTextField.setText(jTextField.getText()+"+"+All_Data.getData().all_input.get(k).getLine());
         }
 
     }

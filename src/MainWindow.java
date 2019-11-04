@@ -26,9 +26,6 @@ public class MainWindow{
     private JTextArea textArea2;
     private JTextPane textPane3;
     private JButton button_half;
-    private JButton button3;
-    private JButton button4;
-    private JButton button5;
     private static java.util.List<Observer> observers = new ArrayList<Observer>();
 
     //将修改后TextArea2内容保存到all_Alpha
@@ -69,17 +66,25 @@ public class MainWindow{
             for (int i=0;i<All_Data.getData().all_Alpha.size();i++){
                 all_Alpha.add(new Data(All_Data.getData().all_Alpha.get(i).getLine_row(),textArea3_lines[i]));
             }
+            All_Data.getData().all_Alpha = all_Alpha;
         }else{
+            int t = 0;
             for (int i=0;i<textArea3_lines.length;i++){
-                if (textArea3_lines[i].equals(All_Data.getData().all_Alpha.get(i).getLine())) {
+                if (All_Data.getData().all_Alpha.get(i).getLine().equals(textArea3_lines[i])){
                     all_Alpha.add(new Data(All_Data.getData().all_Alpha.get(i).getLine_row(),textArea3_lines[i]));
-                }
-                else {
-                    all_Alpha.add(new Data(All_Data.getData().all_Alpha.get(i+1).getLine_row(),textArea3_lines[i]));
+                }else {
+                    t=i;
+                    while (t<All_Data.getData().all_Alpha.size()){
+                        if (All_Data.getData().all_Alpha.get(t).getLine().equals(textArea3_lines[i])){
+                            all_Alpha.add(new Data(All_Data.getData().all_Alpha.get(t).getLine_row(),textArea3_lines[i]));
+                            break;
+                        }
+                        t++;
+                    }
                 }
             }
         }
-        All_Data.getData().all_Alpha = all_Alpha;
+
         for (Data data:All_Data.getData().all_Alpha
         ) {
             System.out.println(data.getLine_row()+" "+data.getLine());
@@ -152,32 +157,8 @@ public class MainWindow{
 
             @Override
             public void keyReleased(KeyEvent e) {
-                System.out.println(textPane3.getText());
-
-                String[] textArea3_lines = textPane3.getText().split("\n");
-                java.util.List<Data> all_Alpha = new ArrayList<>();
-
-//                for (int i=0;i<textArea3_lines.length;i++){
-//                    System.out.println(textArea3_lines[i]);
-//                }
-
-                if(All_Data.getData().all_Alpha.size()==textArea3_lines.length){
-                    for (int i=0;i<All_Data.getData().all_Alpha.size();i++){
-                        all_Alpha.add(new Data(All_Data.getData().all_Alpha.get(i).getLine_row(),textArea3_lines[i]));
-                    }
-                }else{
-                    for (int i=0;i<textArea3_lines.length;i++){
-                        if (textArea3_lines[i].equals(All_Data.getData().all_Alpha.get(i).getLine())) {
-                            all_Alpha.add(new Data(All_Data.getData().all_Alpha.get(i).getLine_row(),textArea3_lines[i]));
-                        }
-                        else {
-                            all_Alpha.add(new Data(All_Data.getData().all_Alpha.get(i+1).getLine_row(),textArea3_lines[i]));
-                        }
-                    }
-                }
-                All_Data.getData().all_Alpha = all_Alpha;
-
-                notifyAllObservers();
+                mobify3();
+                nodifyAllObservers();
             }
         });
 
@@ -290,7 +271,13 @@ public class MainWindow{
 
         }
     }
+    void mobify3(){
+        textArea2.setText("");
+        textArea2.setText(textPane3.getText());
+    }
+    void nodifyAllObservers(){
 
+    }
 
     public static void main(String[] args) {
         JFrame frame = new JFrame("MainWindow");

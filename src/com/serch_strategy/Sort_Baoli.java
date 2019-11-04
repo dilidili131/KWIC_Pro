@@ -27,7 +27,10 @@ public class Sort_Baoli implements Search_Strategy {
                     sum++;
             }
             if (sum == ch.length)
-                jTextField.setText(jTextField.getText()+" "+data.getLine());
+                if (jTextField.getText().isEmpty())
+                    jTextField.setText(data.getLine());
+                else
+                    jTextField.setText(jTextField.getText()+"+"+data.getLine());
         }
 
     }
